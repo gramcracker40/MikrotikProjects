@@ -1,0 +1,90 @@
+#Example script for useage of https tool and sending data to rest api
+
+:global STATTOFILE do={
+/interface {
+wireless {
+scan wlan1 background=yes duration=10s save-file=wlan1scan.txt;
+scan wlan2 background=yes duration=10s save-file=wlan2scan.txt;
+registration-table print file=regtab.txt
+}
+}
+}
+
+#we put the files to variables
+:global FILESTOVAR do={
+:global 2GSCAN [/file get wlan1scan.txt contents];
+:global 5GSCAN [/file get wlan2scan.txt contents];
+:global REGTABLE [/file get regtab.txt contents]
+}
+
+#Pushing to JSON type API.
+#only about background scans.
+
+:global HAPPUSH do={
+:global SLACK;
+:global 2GSCAN;
+:global 5GSCAN;
+:global WIFIVER;
+:global SERIAL;
+:global 2GFREQ;
+:global 5GFREQ;
+:global 2GCCQ;
+:global 5GCCQ;
+:global ETHER5SPD;
+:global VER;
+:global FREESPACE;
+:global UPTIME;
+:global REGTABLE;
+:global ETHERSTAT;
+:global MODEL;
+:global CRITLOG;
+:global WIFILOG;
+:global IFLOG;
+/tool fetch mode=https url=$SLACK http-method=post http-data="parse=none&payload={\"attachments\": [ { \"title\": \"$MODEL\n$SERIAL\nUptime\n$UPTIME\nFree HD Space\n$FREESPACE kb\nFW Version $VER\nWiFi Ver: $WIFIVER \n2G Freq $2GFREQ\n5G Freq $5GFREQ\n2G CCQ $2GCCQ\n5G CCQ $5GCCQ\nEther5 Speed\n$ETHER5SPD\nOnline Devices\n Ethernet\n$ETHERSTAT\nWireless\n $REGTABLE\", \"text\": \"2.4Ghz Background Scan\n $2GSCAN\n 5Ghz Background Scan\n $5GSCAN\nSelected Logs:\nCritical\n$CRITLOG\n Wifi\n$WIFILOG\nInterface\n$IFLOG \"}]}"
+
+};
+
+
+
+/tool fetch mode=https url=$SLACK http-method=post http-data="parse=none&
+payload={\"attachments\": [ { \"title\": \"$MODEL
+\n$SERIAL
+
+\nUptime
+\n$UPTIME
+
+\nFree HD Space
+\n$FREESPACE kb
+
+\nFW Version $VER
+
+\nWiFi Ver: $WIFIVER 
+\n2G Freq $2GFREQ
+\n5G Freq $5GFREQ
+\n2G CCQ $2GCCQ
+\n5G CCQ $5GCCQ
+
+\nEther5 Speed
+\n$ETHER5SPD
+\nOnline Devices
+
+\n Ethernet
+\n$ETHERSTAT
+
+\nWireless
+\n $REGTABLE\", \"text\": \"2.4Ghz Background Scan
+\n $2GSCAN
+
+\n 5Ghz Background Scan
+\n $5GSCAN\nSelected Logs:
+
+\nCritical
+\n$CRITLOG
+
+\n Wifi
+\n$WIFILOG
+
+\nInterface
+\n$IFLOG \"}]}"
+
+

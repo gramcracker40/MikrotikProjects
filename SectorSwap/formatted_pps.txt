@@ -1,0 +1,31 @@
+/system script add name=PingPrimarySSID source="\n# Garrett Mathers --> Webfire Wireless --> Scripts --> Antennas --> Sector Swap\r\
+	\n#\r\
+	\n# 5/26/2022\r\
+	\n#\r\
+	\n#\r\
+	\n# Description:\r\
+	\n#	This program will be launched whenever find_best_ssid is initiated.\r\
+	\n#	It will simply ping the old sector antenna until it is able to reconnect\r\
+	\n\r\
+	\n:global primarySSID;\r\
+	\n:global failCount; \r\
+	\n\r\
+	\n:global sectors {wf-sector1a=192.168.20.177; wf-sector1b=192.168.20.178; wf-sector1c=192.168.20.179; wf-sector1d=192.168.20.180; wf-sector2a=192.168.20.181; wf-sector2b=192.168.20.182; wf-sector2c=192.168.20.183; wf-sector2d=192.168.20.184; wf-sector3a=192.168.20.185; wf-sector3b=192.168.20.186; wf-sector3c=192.168.20.187; wf-sector3d=192.168.20.188; wf-sector4=192.168.20.251; wf-sector5=192.168.20.250; wf-sector6=192.168.20.249; wf-sector7=192.168.20.237; wf-sector8=192.168.20.226; wf-sector9=192.168.20.207 };\r\
+	\n:put \$sectors ;\r\
+	\n\r\
+	\n:put (\$sectors->\$primarySSID);\r\
+	\n\r\
+	\n:global primaryPing [/ping (\$sectors->\$primarySSID) count=10];\r\
+	\n\r\
+	\n:put \$primaryPing ;\r\
+	\n\r\
+	\n:if (\$primaryPing > 7) do={\r\
+	\n\t	/log info \"Primary SSID back Online: Swapping back to ssid=\$primarySSID\"\r\
+	\n\t	/interface wireless set 0 ssid=\$primarySSID\r\
+	\n\t	/system scheduler remove [find name=primarySwap]\r\
+	\n\t	:set failCount 0 ;\r\
+	\n} else={\r\
+	\n\t	/log info \"Primary SSID still down: #ping: \$primaryPing \" \r\
+	\n}"
+
+

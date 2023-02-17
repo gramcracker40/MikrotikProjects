@@ -1,0 +1,31 @@
+/system script add name=antennaSitter source="\n#Garrett Mathers --> Webfire Wireless --> Scripts --> Antennas --> Sector Swap\r\
+\n#\r\
+\n#5/25/2022\r\
+\n# \r\
+\n#Description:\r\
+\n#This script will sit on the antenna and perform this automated test for the antenna's sector ID\r\
+\n#If the antenna has no internet, increment the check fail count by one\r\
+\n#If the antenna has internet, pass the check with all good logged and reset the check fail count\r\
+\n#Designed to be ran every 15 minutes --- 4 errors = down for hour. initiate switch...\r\
+\n\r\
+\n#grabbing the wireless registration for the antenna\r\
+\n:global registration [/interface wireless registration-table get 0] ;\r\
+\n\r\
+\n:if ([:typeof \$registration] = \"nothing\") do={\r\
+\n    :set failCount (\$failCount + 1) ; \r\
+\n    :put \"adding 1: failcount: \$failCount \" ; \r\
+\n    /log info \"Sector Swap Check: FAIL # \$failCount \" ;\r\
+\n} else={\r\
+\n    /log info \"Sector Swap Check: ALL GOOD\" ;\r\
+\n    :set failCount 0; \r\
+\n    :put \$failCount ;\r\
+\n}\r\
+\n\r\
+\n#If the fail count is equal to 4, they have been down for an hour, swap the sectors\r\
+\n:if (\$failCount = 4) do={\r\
+\n    /log info \"Sector Swap Check: Swapping Sectors\" \r\
+\n    /system script run [find name=scanSaveToFile] ; \r\
+\n    /delay 2s\r\
+\n    /system script run [find name=findBestSSID] ; \r\
+\n    }"
+

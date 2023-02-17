@@ -1,0 +1,41 @@
+#Garrett Mathers --- Webfire --- 5/23/2022
+
+#This script will sit on the antenna and perform this automated test for the antenna's sector ID
+#If the antenna has no internet, increment the check fail count by one
+#If the antenna has internet, pass the check with all good logged and reset the check fail count
+#Designed to be ran every 15 minutes --- 4 errors = down for hour. initiate switch...
+
+#grabbing the two best sectors from the bestSSID file 
+:global bestSSIDfile [/file get [/file find name=bestSSID.txt] contents] ;
+:global SSIDfile [:toarray $bestSSIDfile] ;
+
+:global bestSSID [:pick $SSIDfile 0] ;
+:global secondarySSID [:pick $SSIDfile 1] ;
+:global currentSSID [/interface wireless get 0 ssid] ; 
+
+:put [$bestSSID] ;
+:put [$secondarySSID] ;
+:put [$currentSSID] ; 
+
+#trying to ping the default gateway to the sector antenna
+:global pingAttempt [/ping 192.168.0.1 count=10 interval=1] ; 
+
+#if the number of successful pings is less than 8, perform below actions
+:if ($pingAttempt < 8) do={
+	:set failCount [$failCount + 1] ; 
+	/log info "Sector Swap Check: FAIL # $failCount "
+} else={
+	/log info "Sector Swap Check: ALL GOOD"
+	:set failCount 0; 
+}
+
+#If the fail count is equal to 4, they have been down for an hour, swap the sectors
+:if ($failCount = 4) do={
+	:if ($currentSSID != $bestSSID) do={
+		/interface wireless set 0 ssid=$bestSSID
+	} else={
+		/interface wireless set 0 ssid=$secondarySSID
+	}
+}
+
+
