@@ -11,9 +11,19 @@ gets save to the mikrotik for us to go off of in the scripting.
 Since the scan takes a while we have to do it this way. 
 Scan first, determine second. 
 
-You must specify the companies sector antennas in an array, or whatever attribute you want to check for each of them 
+You must specify the companies sector antennas in an array with their ip's as values, or whatever attribute you want to check for each of them 
 to be able to properly determine.
 
 Whenever the swap is performed, another script will be sent to the scheduler. 
-ping_primary_ssid.txt will ping the 
+ping_primary_ssid.txt will ping the original sector antennas ip address to try to get back on whenever it comes back up. 
+This way, a network administrator would not have to play clean up after this script runs. Must have list of sector antenna
+names and ip's in order to do this
 
+
+SCRIPTS:
+sector_swap.rsc
+antenna_sitter.rsc
+scan_save_to_file.rsc
+ping_primary_ssid.rsc
+
+main.rsc will be the installer originally built. format as needed
