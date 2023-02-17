@@ -1,4 +1,3 @@
-# Purpose: 
 SectorSwap was built as a form of automated redundancy among our wireless customers antennas.
 You simply would run this script on any routerOS antenna the below explanation will go over each scripts purpose
 The script "antenna_sitter" simply runs as a check, once there is no established 
