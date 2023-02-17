@@ -66,7 +66,7 @@ I	Name Of Scripts:
 #
 
 
-Webfire Wireless --> Scripts --> Antennas --> Sector Swap -> find_best_ssid
+find_best_ssid
 #5/25/2022
 
 Purpose:
@@ -78,7 +78,7 @@ Usage:
 #Once parsed it will compare each signal and find the best signal as well as the ssid associated 
 
 
-Webfire Wireless --> Scripts --> Antennas --> Sector Swap -> antenna_sitter
+antenna_sitter
 #
 #5/25/2022
 # 
@@ -89,7 +89,7 @@ Webfire Wireless --> Scripts --> Antennas --> Sector Swap -> antenna_sitter
 #Designed to be ran every ex minutes --- ex errors = down for hour. initiate switch...
 
 
-Webfire Wireless --> Scripts --> Antennas --> Sector Swap -> scan_save_to_file
+scan_save_to_file
 5/23/2022
 #This script scans for available Antennas and documents its findings
 #in a file for the antenna_sitter script to pull from every 12 hours
@@ -99,10 +99,10 @@ Webfire Wireless --> Scripts --> Antennas --> Sector Swap -> scan_save_to_file
 #instead of just an hour. 
 
 
-Webfire Wireless --> Scripts --> Antennas --> Sector Swap -> ping_primary_ssid
-# 5/26/2022
-# Description:
-#	This program will be launched whenever find_best_ssid is initiated.
-#	It will simply ping the old sector antenna until it is able to reconnect
-#	When the old one it was on comes back online, it will reassociate its SSID
-#	to be the same as it was before the outage. 
+ping_primary_ssid
+5/26/2022
+ Description:
+	This program will be launched whenever find_best_ssid is initiated.
+	It will simply ping the old sector antenna until it is able to reconnect
+	When the old one it was on comes back online, it will reassociate its SSID
+  to be the same as it was before the outage. 
