@@ -28,15 +28,15 @@ ping_primary_ssid.rsc
 main.rsc will be the installer originally built. format as needed
 
 
-Webfire Wireless Sector Swap Script
-Version: 1.0  Date: 5/28/2022
+# Webfire Wireless Sector Swap Script
+## Version: 1.0  Date: 5/28/2022
 
-# Purpose:
+## Purpose:
 Facilitates the automatic 'swapping' of customer antennas' wlan1 interface affiliated SSID
 whenever the customer antenna goes offline for more than 15 minutes. Or whatever interval of time
 specified.
 
-# Usage:
+## Usage:
 Simply, connect your computer into the antenna, open up winbox and get into the antennas routeros
 Note before hand, you will need to pause the schedule (RouterOS Guide) after running the script
 the reason for this is you need to associate your antenna with the sector before allowing the script to begin
@@ -44,7 +44,7 @@ open up a new terminal, type "import sector_swap.txt" or ".rsc" depending on how
 The program will place four scripts in the Scripts section and will place a schedule in the Scheduler.
 check for them to confirm the process executed
 
-# Info:
+## Info:
 It is programmed below to schedule the antennaSitter script to run every 3 minutes, with 4 fails (12 minutes)
 of the script it will initiate sector swap. This can be changed once the schedule is placed. Once it has initiated
 Sector Swap and the antenna has regained a connection, it will launch PingPrimarySSID. It will set the Primary SSID as
