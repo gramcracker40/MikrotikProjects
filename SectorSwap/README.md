@@ -33,12 +33,12 @@ main.rsc will be the installer originally built. format as needed
 Webfire Wireless Sector Swap Script
 Version: 1.0  Date: 5/28/2022
 
-I	Purpose:
+# I	Purpose:
 Facilitates the automatic 'swapping' of customer antennas' wlan1 interface affiliated SSID
 whenever the customer antenna goes offline for more than 15 minutes. Or whatever interval of time
 specified.
 
-I	Usage:
+# I	Usage:
 Simply, connect your computer into the antenna, open up winbox and get into the antennas routeros
 Note before hand, you will need to pause the schedule (RouterOS Guide) after running the script
 the reason for this is you need to associate your antenna with the sector before allowing the script to begin
@@ -46,7 +46,7 @@ open up a new terminal, type "import sector_swap.txt" or ".rsc" depending on how
 The program will place four scripts in the Scripts section and will place a schedule in the Scheduler.
 check for them to confirm the process executed
 
-I	Info:
+# I	Info:
 It is programmed below to schedule the antennaSitter script to run every 3 minutes, with 4 fails (12 minutes)
 of the script it will initiate sector swap. This can be changed once the schedule is placed. Once it has initiated
 Sector Swap and the antenna has regained a connection, it will launch PingPrimarySSID. It will set the Primary SSID as
@@ -55,41 +55,41 @@ it will remember which one it was on and begin sending a series of pings at it e
 to reconnect. Once it regains connection of its primary sector antenna, all of the global variables reset and Sector Swap
 begins its regular checks to ensure the antenna stays online. 
 
-I	Name Of Scripts:
-#antennaSitter
-#findBestSSID
-#PingPrimarySSID
-#scanSaveToFile
+# I	Name Of Scripts:
+## antennaSitter
+## findBestSSID
+## PingPrimarySSID
+## scanSaveToFile
 #
-#I	Name Of Scheduler:
-#SectorCheck
+# I	Name Of Scheduler:
+## SectorCheck
 #
 
 
-find_best_ssid
+# find_best_ssid
 #5/25/2022
 
-Purpose:
+## Purpose:
 #This program determines the next best webfire sector antenna and then switches the antenna
 #to the new sector automatically when ran. This is the extension of "antenna_sitter" 
 #meant to be used to ensure the customer maintains a connection even with sector antenna issues
-Usage: 
+## Usage: 
 #It will simply take the scan file produced by SCAN_SAVE_TO_FILE and parse it out accordingly
 #Once parsed it will compare each signal and find the best signal as well as the ssid associated 
 
 
-antenna_sitter
+# antenna_sitter
 #
 #5/25/2022
 # 
-#Description:
+## Description:
 #This script will sit on the antenna and perform this automated test for the antenna's sector ID
 #If the antenna has no internet, increment the check fail count by one
 #If the antenna has internet, pass the check with all good logged and reset the check fail count
 #Designed to be ran every ex minutes --- ex errors = down for hour. initiate switch...
 
 
-scan_save_to_file
+# scan_save_to_file
 5/23/2022
 #This script scans for available Antennas and documents its findings
 #in a file for the antenna_sitter script to pull from every 12 hours
