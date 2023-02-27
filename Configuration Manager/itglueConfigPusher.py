@@ -1,9 +1,12 @@
 import requests
 import json
+from dotenv import dotenv_values
 
 #Connection details
-API_KEY = "ITG.d5e30099a049c1868b0f2a545090f91d.sm4SCCPX9fy0E5JjpSj1Xwfpxp4184L6FaCp-Xa5EA7cgw_FQ7A28zOqLgh0kNJ0"
-baseUrl = "https://api.itglue.com"
+config = dotenv_values(".env")
+#Connection details
+API_KEY = config["API_KEY"]
+baseUrl = config["base_url"]
 organizationID = 6266809
 configuration_post = f'/organizations/{organizationID}/relationships/configurations'
 
