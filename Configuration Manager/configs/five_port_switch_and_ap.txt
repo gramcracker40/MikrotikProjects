@@ -1,0 +1,82 @@
+# oct/07/2022 11:48:19 by RouterOS 6.48.6
+# software id = CMXU-R0LI
+#
+# model = RouterBOARD 952Ui-5ac2nD
+# serial number = 71B107500A67
+
+:global 5gssid "%/ssid5/%";
+:global 2gssid "%/ssid2/%";
+:global radioName "%/radio_name/%";
+:global customerPassword "%/customer_password/%";
+:global sysIdentity "%/system_identity/%";
+:global adminPassword "%/admin_password/%";
+
+/interface bridge
+add comment="This is to tie all interfaces together" name=lan
+
+/interface wireless
+set [ find default-name=wlan1 ] comment=2.4Ghz disabled=no radio-name=$radioName \
+    ssid=$2gssid
+set [ find default-name=wlan2 ] comment=5Ghz disabled=no radio-name=$radioName  \
+    ssid=$5gssid
+
+/interface wireless manual-tx-power-table
+set wlan1 comment=2.4Ghz
+set wlan2 comment=5Ghz
+
+/interface wireless nstreme
+set wlan1 comment=2.4Ghz
+set wlan2 comment=5Ghz
+
+/interface wireless security-profiles
+set [ find default=yes ] authentication-types=wpa2-psk mode=dynamic-keys \
+    supplicant-identity=webfireDef wpa2-pre-shared-key=$customerPassword
+
+/ip hotspot profile
+set [ find default=yes ] html-directory=hotspot
+
+/interface bridge port
+add bridge=lan interface=all
+
+/ip dhcp-client
+add comment="This is on the entire bridge" disabled=no interface=lan
+
+/ip firewall filter
+add action=accept chain=input comment=\
+    "defconf: accept established,related,untracked" connection-state=\
+    established,related,untracked
+add action=drop chain=input comment="defconf: drop invalid" connection-state=\
+    invalid
+add action=accept chain=input comment="Winbox Remote Access" dst-port=8291 \
+    protocol=tcp src-address=64.57.224.15
+add action=accept chain=input comment="defconf: accept ICMP" protocol=icmp
+add action=drop chain=input comment="defconf: drop all not coming from LAN" \
+    in-interface=PPPoE-Webfire
+add action=drop chain=input comment="defconf: drop all not coming from LAN" \
+    in-interface=ether1-wan
+add action=accept chain=forward comment="defconf: accept in ipsec policy" \
+    ipsec-policy=in,ipsec
+add action=accept chain=forward comment="defconf: accept out ipsec policy" \
+    ipsec-policy=out,ipsec
+add action=fasttrack-connection chain=forward comment="defconf: fasttrack" \
+    connection-state=established,related
+add action=accept chain=forward comment=\
+    "defconf: accept established,related, untracked" connection-state=\
+    established,related,untracked
+add action=drop chain=forward comment="defconf: drop invalid" \
+    connection-state=invalid
+add action=drop chain=forward comment=\
+    "defconf:  drop all from WAN not DSTNATed" connection-nat-state=!dstnat \
+    connection-state=new in-interface=PPPoE-Webfire
+add action=drop chain=forward comment=\
+    "defconf:  drop all from WAN not DSTNATed" connection-nat-state=!dstnat \
+    connection-state=new in-interface=ether1-wan
+
+/system clock
+set time-zone-name=America/Chicago
+
+/system identity
+set name=$sysIdentity
+
+/password old-password="" new-password=$adminPassword confirm-new-password=$adminPassword
+

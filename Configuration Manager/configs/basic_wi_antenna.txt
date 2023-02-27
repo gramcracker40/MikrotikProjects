@@ -1,0 +1,50 @@
+:global systemIdentity "%/system_identity/%"; 
+:global radioName "%/radio_name/%"; 
+
+/interface bridge
+add name=passthru-bridge
+add name=vlan50-bridge
+
+/interface ethernet
+set [ find default-name=ether1 ] speed=100Mbps
+
+/interface vlan
+add interface=passthru-bridge name=vlan50 vlan-id=50
+
+/interface wireless security-profiles
+set [ find default=yes ] supplicant-identity=mikrotik
+add authentication-types=wpa-psk,wpa2-psk group-ciphers=tkip,aes-ccm mode=\
+    dynamic-keys name=radius-encrypted supplicant-identity=mikrotik \
+    unicast-ciphers=tkip,aes-ccm wpa-pre-shared-key=ch37pavupa6rech3 \
+    wpa2-pre-shared-key=ch37pavupa6rech3
+
+/interface wireless
+set [ find default-name=wlan1 ] antenna-gain=0 arp=disabled band=5ghz-a/n \
+    country="united states" disabled=no frequency=5260 frequency-mode=\
+    manual-txpower mode=station-bridge radio-name=$radioName security-profile=\
+    radius-encrypted ssid=wf-sector3a station-roaming=enabled \
+    wireless-protocol=nv2-nstreme-802.11
+
+/user group
+set full policy="local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,passw\
+    ord,web,sniff,sensitive,api,romon,dude,tikapp"
+
+/interface bridge port
+add bridge=passthru-bridge interface=ether1
+add bridge=passthru-bridge interface=wlan1
+add bridge=vlan50-bridge interface=vlan50
+
+/ip neighbor discovery-settings
+set discover-interface-list=!dynamic
+
+/ip dhcp-client
+add disabled=no interface=vlan50-bridge
+
+/system clock
+set time-zone-name=America/Chicago
+
+/system identity
+set name=$systemIdentity
+
+/system ntp client
+set enabled=yes

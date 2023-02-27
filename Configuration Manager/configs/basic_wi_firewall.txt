@@ -1,0 +1,165 @@
+# BEFORE YOU START, EDIT THIS FILE
+# ********************************
+# Set Identity to "UserWi Firewall"
+# Set PPPoE Username UserWi
+# Set PPPoE Password WFw!reless
+# Set Wireless SSID UserWi
+# Set Wireless Security Profile 12345678
+#
+# ON THE ROUTER PART 1
+# ********************************
+# Install OS Package "routeros-mipsbe-6.40.5.npk"
+# REBOOT
+# Upgrade to latest firmware
+# REBOOT
+# Reset Configuration Selecting "NO CONFIG" & "NO BACKUP"
+# REBOOT
+#
+# ON THE ROUTER PART 2
+# ********************************
+# Drag and drop this file into Winbox
+# Click File fom the left-hand menu and select the file you drug over
+# Dbl-Click your selected file, right-click and copy filename
+# Open Terminal Window
+# type Import <space> paste copied filaname and press ENTER
+# After 5-10 seconds you should get a successful Import message
+#
+# ON THE ROUTER PART 3
+# ********************************
+# SET system user admin password ONLY if thw password will be
+#  different than our standard admin password.
+# Copy Master Ethernet Interface MAC(Usually Ether2) to Brige Admin MAC
+# Place a Web Fire label on unit with PPPoE and basic config info
+# Place a Web Fire label on unit Ccontaioning Wi-Fi SSID and password
+#
+#
+# ********************************
+# ********* SCRIPT START *********
+# ********************************
+#
+# RouterOS 6.45.6
+# model = RouterBOARD 952Ui-5ac2nD
+
+:global 5gssid "%/ssid5g/%"; 
+:global 2gssid "%/ssid2g/%";
+:global customerPassword "%/customer_password/%";
+:global sysIdentity "%/system_identity/%";
+:global adminPassword "%/admin_password/%";
+:global ipDHCPpool "%/ip_dhcp_pool/%";
+:global ipAddressLAN "%/ip_address_lan/%";
+:gloabl ipNetworkLAN "%/ip_network_lan/%";
+
+/interface bridge
+add name=brLAN
+
+/interface ethernet
+set [ find default-name=ether1 ] name=ether1-wan
+set [ find default-name=ether2 ] name=ether2-master-lan
+set [ find default-name=ether3 ] name=ether3-slave-lan
+set [ find default-name=ether4 ] name=ether4-slave-lan
+set [ find default-name=ether5 ] name=ether5-slave-lan poe-out=off
+
+/interface pppoe-client
+add add-default-route=yes disabled=no interface=ether1-wan name=PPPoE-Webfire \
+    password=WFw!reless use-peer-dns=yes user=UserWi
+
+/interface wireless
+set [ find default-name=wlan1 ] band=2ghz-b/g/n channel-width=20/40mhz-Ce \
+    disabled=no distance=indoors frequency=auto mode=ap-bridge ssid=$ssid2g \
+    wireless-protocol=802.11
+set [ find default-name=wlan2 ] band=5ghz-a/n/ac channel-width=\
+    20/40/80mhz-Ceee disabled=no distance=indoors frequency=auto mode=\
+    ap-bridge ssid=$ssid5g wireless-protocol=802.11
+
+/interface wireless security-profiles
+set [ find default=yes ] authentication-types=wpa2-psk eap-methods="" mode=\
+    dynamic-keys supplicant-identity=webfireDef wpa2-pre-shared-key=$customerPassword
+
+/ip hotspot profile
+set [ find default=yes ] html-directory=flash/hotspot
+
+/ip pool
+add name=default-dhcp ranges=$ipDHCPpool
+
+/ip dhcp-server
+add address-pool=default-dhcp disabled=no interface=brLAN lease-time=3d name=\
+    defconf
+
+/interface bridge port
+add bridge=brLAN interface=ether2-master-lan
+add bridge=brLAN interface=wlan1
+add bridge=brLAN interface=wlan2
+add bridge=brLAN interface=ether3-slave-lan
+add bridge=brLAN interface=ether4-slave-lan
+add bridge=brLAN interface=ether5-slave-lan
+
+/ip address
+add address=$ipAddressLAN comment=defconf interface=brLAN network=\
+    $ipNetworkLAN
+
+/ip dhcp-server network
+add address=$ipNetworkLAN dns-server=$ipAddressLAN gateway=$ipAddressLAN \
+    ntp-server=time.nist.gov
+
+/ip dns
+set allow-remote-requests=yes
+
+/ip dns static
+add address=$ipAddressLAN name=router.lan
+
+/ip firewall filter
+add action=accept chain=input comment=\
+    "defconf: accept established,related,untracked" connection-state=\
+    established,related,untracked
+add action=drop chain=input comment="defconf: drop invalid" connection-state=\
+    invalid
+add action=accept chain=input comment="Winbox Remote Access" dst-port=8291 \
+    protocol=tcp src-address=64.57.224.15
+add action=accept chain=input comment="defconf: accept ICMP" protocol=icmp
+add action=drop chain=input comment="defconf: drop all not coming from LAN" \
+    in-interface=PPPoE-Webfire
+add action=drop chain=input comment="defconf: drop all not coming from LAN" \
+    in-interface=ether1-wan
+add action=accept chain=forward comment="defconf: accept in ipsec policy" \
+    ipsec-policy=in,ipsec
+add action=accept chain=forward comment="defconf: accept out ipsec policy" \
+    ipsec-policy=out,ipsec
+add action=fasttrack-connection chain=forward comment="defconf: fasttrack" \
+    connection-state=established,related
+add action=accept chain=forward comment=\
+    "defconf: accept established,related, untracked" connection-state=\
+    established,related,untracked
+add action=drop chain=forward comment="defconf: drop invalid" \
+    connection-state=invalid
+add action=drop chain=forward comment=\
+    "defconf:  drop all from WAN not DSTNATed" connection-nat-state=!dstnat \
+    connection-state=new in-interface=PPPoE-Webfire
+add action=drop chain=forward comment=\
+    "defconf:  drop all from WAN not DSTNATed" connection-nat-state=!dstnat \
+    connection-state=new in-interface=ether1-wan
+
+/ip firewall nat
+add action=masquerade chain=srcnat comment="defconf: masquerade" \
+    ipsec-policy=out,none out-interface=PPPoE-Webfire
+
+/ip firewall service-port
+set sip disabled=yes
+
+/ip service
+set telnet disabled=yes
+set ftp disabled=yes
+set www disabled=yes
+set ssh disabled=yes
+set api disabled=yes
+set api-ssl disabled=yes
+
+/system clock
+set time-zone-name=America/Chicago
+
+/system identity
+set name=$sysIdentity
+
+/system ntp client
+set enabled=yes server-dns-names=time.nist.gov
+
+/password old-password="" new-password=$adminPassword confirm-new-password=$adminPassword

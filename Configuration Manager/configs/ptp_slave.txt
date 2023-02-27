@@ -1,0 +1,60 @@
+:global radioName "%/radio_name/%";
+:global 5gssid "%/ssid5g/%";
+:global customerPasswordWPATwo "%/customer_password_wpa_two/%";
+:global sysIdentity "%/system_identity/%";
+
+/interface bridge
+add auto-mac=yes comment=defconf name=bridge
+
+/interface wireless
+set [ find default-name=wlan1 ] antenna-gain=0 band=5ghz-onlyn disabled=no country="united states3" frequency=auto installation=any mode=station-bridge radio-name=radioName ssid=5gssid station-roaming=enabled wds-default-bridge=bridge wds-mode=dynamic
+
+/interface vlan
+add interface=bridge name=vlan50 vlan-id=50
+
+/interface wireless security-profiles
+set [ find default=yes ] authentication-types=wpa2-psk eap-methods="" mode=\
+    dynamic-keys supplicant-identity=webfireDef wpa2-pre-shared-key=customerPasswordWPATwo
+
+/user group
+set full policy="local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,pas\
+    sword,web,sniff,sensitive,api,romon,dude,tikapp"
+
+/interface bridge port
+add bridge=bridge comment=defconf interface=ether1
+add bridge=bridge comment=defconf interface=wlan1
+
+/ip neighbor discovery-settings
+set discover-interface-list=!dynamic
+
+/ip address
+add address=192.168.20.168/22 comment="Mgmt IP" interface=vlan50 network=\
+    192.168.20.0
+
+/ip dns
+set servers=192.168.20.1
+
+/ip route
+add distance=1 gateway=192.168.20.1
+
+/ip ssh
+set allow-none-crypto=yes forwarding-enabled=remote
+
+/system clock
+set time-zone-name=America/Chicago
+
+/system identity
+set name=sysIdentity
+
+/system ntp client
+set enabled=yes server-dns-names=time.nist.gov
+
+/system scheduler
+add name="Reboot Router" on-event="/system reboot" policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon \
+    start-date=apr/19/2019 start-time=05:00:00
+add name="Upgrade Routerboard FW" on-event=\
+    "/system routerboard upgrade\r\
+    \n/system reboot" policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon \
+    start-date=apr/19/2019 start-time=05:05:00

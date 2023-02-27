@@ -1,0 +1,89 @@
+[
+    {
+        "name" : "basic_wi_firewall.txt",
+        "%/admin_password/%": "", 
+        "%/system_identity/%": "",
+        "%/customer_password/%": "", 
+        "%/ssid2g/%": "",
+        "%/ssid5g/%": "",
+        "%/ip_dhcp_pool/%": "",
+        "%/ip_address_lan/%": "",
+        "%/ip_network_lan/%": ""
+    },
+    {
+        "name": "basic_firewall_with_capsman.txt",
+        "%/capsman_password/%": "",
+        "%/ssid5/%": "",
+        "%/ssid2/%": "", 
+        "%/system_identity/%": ""
+    },
+    {
+        "name": "basic_switch.txt",
+        "%/identity/%": ""
+    },
+    {
+        "name": "basic_wi_antenna.txt",
+        "%/system_identity/%": "",
+        "%/radio_name/%": ""
+    },
+    {
+        "name": "basic_wi_firewall_no_wifi.txt",
+        "%/sysIdentity/%": "",
+        "%/wisecprokey/%": "",
+        "%/wisecproiden/%": "",
+        "%/admin_password/%": ""
+    },
+    {
+        "name": "capsman_client.txt",
+        "%/ssid5g/%": "",
+        "%/customer_password_wpa/%": "",
+        "%/customer_password_wpa_two/%": "",
+        "%/system_identity/%": "",
+        "%/admin_password/%": ""
+    },
+    {
+        "name": "five_port_switch_and_ap.txt",
+        "%/ssid5/%": "",
+        "%/ssid2/%": "",
+        "%/radio_name/%": "",
+        "%/customer_password/%": "",
+        "%/system_idnetity/%": "",
+        "%/admin_password/%": ""
+    },
+    {
+        "name": "ptp_master.txt",
+        "%/radio_name/%": "",
+        "%/ssid5g/%": "",
+        "%/customer_password_wpa_two/%": "",
+        "%/system_identity/%": "",
+        "%/admin_password/%": ""
+    },
+    {
+        "name": "ptp_slave.txt",
+        "%/radio_name/%": "",
+        "%/ssid5g/%": "",
+        "%/customer_password_wpa_two/%": "",
+        "%/system_identity/%": "",
+        "%/admin_password/%": ""
+    },
+    {
+        "name": "wifi_to_ethernet_with_nat.txt",
+        "%/customer_password_wpa_two/%": "",
+        "%/wireless_security_profile_name_lan/%": "",
+        "%/wireless_network_to_connect/%": "",
+        "%/wireless_security_profile_name_wan/%": "",
+        "%/system_identity/%": "",
+        "%/admin_password/%": ""
+    },
+    {
+        "name": "wifi_to_ethernet_with_no_nat.txt",
+        "%/ssid2g/%": "",
+        "%/customer_password_wpa_two/%": "",
+        "%/wireless_security_profile_name_lan/%": "",
+        "%/wireless_network_to_connect/%": "",
+        "%/wireless_security_profile_name_wan/%": "",
+        "%/system_identity/%": "",
+        "%/admin_passowrd/%": ""
+    }
+
+]

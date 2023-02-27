@@ -1,0 +1,13 @@
+{   
+    "1": "basic_wi_firewall.txt",
+    "2": "basic_firewall_with_capsman.txt",
+    "3": "basic_switch.txt",
+    "4": "basic_wi_antenna.txt",
+    "5": "basic_wi_firewall_no_wifi.txt",
+    "6": "capsman_client.txt",
+    "7": "five_port_switch_and_ap.txt",
+    "8": "ptp_master.txt",
+    "9": "ptp_slave.txt",
+    "10": "wifi_to_ethernet_with_nat.txt",
+    "11": "wifi_to_ethernet_with_no_nat.txt"
+}

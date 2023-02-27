@@ -1,0 +1,64 @@
+# oct/07/2022 10:41:44 by RouterOS 6.49.5
+# software id = G20R-MTI7
+#
+# model = 911G-5HPnD
+# serial number = 60390550A977
+
+:global 5gssid "%/ssid5g/%";
+:global customerPasswordWPA "%/customer_password_wpa/%";
+:global customerPasswordWPATwo "%/customer_password_wpa_two/%";
+:global systemIdentity "%/system_identity/%";
+:global adminPassword "%/admin_password/%";
+
+/interface bridge
+add admin-mac=E4:8D:8C:F5:E3:EE auto-mac=no comment=defconf name=bridge
+
+/interface wireless
+managed by CAPsMAN
+channel: 5745/20-Ce/an(30dBm), SSID:$5gssid, CAPsMAN forwarding
+set [ find default-name=wlan1 ] band=5ghz-a/n channel-width=20/40mhz-XX \
+    country="united states" frequency=5745 installation=outdoor mode=ap-bridge \
+    rx-chains=0,1 ssid=5gssid tx-chains=0,1
+
+/interface list
+add name=WAN
+
+/interface wireless security-profiles
+set [ find default=yes ] authentication-types=wpa2-psk eap-methods="" mode=\
+    dynamic-keys supplicant-identity=webfireDef wpa-pre-shared-key=$customerPasswordWPA \
+    wpa2-pre-shared-key=$customerPasswordWPATwo
+
+/interface bridge port
+add bridge=bridge comment=defconf interface=ether1
+
+/interface list member
+add interface=ether1 list=WAN
+
+/interface wireless cap
+# 
+set discovery-interfaces=bridge enabled=yes interfaces=wlan1
+
+/ip address
+add address=192.168.88.4/24 interface=bridge network=192.168.88.0
+
+/ip dns
+set servers=192.168.88.1
+
+/ip route
+add distance=1 gateway=192.168.88.1
+
+/ip service
+set telnet disabled=yes
+set ftp disabled=yes
+set www disabled=yes
+set ssh disabled=yes
+set api disabled=yes
+set api-ssl disabled=yes
+
+/system clock
+set time-zone-name=America/Chicago
+
+/system identity
+set name=$systemIdentity
+
+/password old-password="" new-password=$adminPassword confirm-new-password=$adminPassword

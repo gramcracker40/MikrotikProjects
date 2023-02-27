@@ -1,0 +1,77 @@
+# oct/10/2022 13:24:46 by RouterOS 6.48.6
+# software id = CMXU-R0LI
+#
+# model = RouterBOARD 952Ui-5ac2nD
+# serial number = 71B107500A67
+
+:global 2gssid "%/ssid2g/%";
+:global customerPasswordWPATwo "%/customer_password_wpa_two/%";
+:global wirelessSecurityProfileNameLAN "%/wireless_security_profile_name_lan/%";
+:global wirelessNetworkToConnect "%/wireless_network_to_connect/%";
+:global wirelessSecurityProfileNameWAN "%/wireless_security_profile_name_wan/%";
+:global sysIdentity "%/system_identity/%";
+:global adminPassword "%/admin_passowrd/%";
+
+/interface bridge
+add comment="This should be an interface to collect all interfaces" name=All
+
+/interface wireless
+set [ find default-name=wlan1 ] ssid=$2gssid
+
+/interface wireless security-profiles
+set [ find default=yes ] supplicant-identity=webfireDef
+add authentication-types=wpa2-psk mode=\
+    dynamic-keys name=$wirelessSecurityProfileNameLAN supplicant-identity=webfireDef wpa2-pre-shared-key=\
+    $customerPasswordWPATwo
+
+/interface wireless
+set [ find default-name=wlan2 ] band=5ghz-a/n/ac channel-width=20/40/80mhz-Ceee \
+    disabled=no frequency=5745 mode=station-pseudobridge security-profile=\
+    $wirelessSecurityProfileNameWAN ssid=$wirelessNetworkToConnect
+
+/ip hotspot profile
+set [ find default=yes ] html-directory=hotspot
+
+/interface bridge port
+add bridge=All interface=all
+
+/ip dhcp-client
+# DHCP client can not run on slave interface!
+add comment="This is to grant an IP address for the Mikrotik" disabled=no interface=\
+    wlan2
+
+/ip firewall filter
+add action=accept chain=input comment="defconf: accept established,related,untracked" \
+    connection-state=established,related,untracked
+add action=drop chain=input comment="defconf: drop invalid" connection-state=invalid
+add action=accept chain=input comment="Winbox Remote Access" dst-port=8291 protocol=tcp \
+    src-address=64.57.224.15
+add action=accept chain=input comment="defconf: accept ICMP" protocol=icmp
+add action=accept chain=forward comment="defconf: accept in ipsec policy" ipsec-policy=\
+    in,ipsec
+add action=accept chain=forward comment="defconf: accept out ipsec policy" ipsec-policy=\
+    out,ipsec
+add action=fasttrack-connection chain=forward comment="defconf: fasttrack" \
+    connection-state=established,related
+add action=accept chain=forward comment="defconf: accept established,related, untracked" \
+    connection-state=established,related,untracked
+add action=drop chain=forward comment="defconf: drop invalid" connection-state=invalid
+
+/system clock
+set time-zone-name=America/New_York
+
+/ip service
+set telnet disabled=yes
+set ftp disabled=yes
+set www disabled=yes
+set ssh disabled=yes
+set api disabled=yes
+set api-ssl disabled=yes
+
+/system identity
+set name=$sysIdentity
+
+/system ntp client
+set enabled=yes server-dns-names=time.nist.gov
+
+/password old-password="" new-password=$adminPassword confirm-new-password=$adminPassword

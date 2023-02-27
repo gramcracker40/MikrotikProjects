@@ -1,0 +1,55 @@
+:global radioName "%/radio_name/%";
+:global 5gssid "%/ssid5g/%";
+:global customerPasswordWPATwo "%/customer_password_wpa_two/%";
+:global sysIdentity "%/system_identity/%";
+:global adminPassword "%/admin_password/%";
+
+/interface bridge
+add auto-mac=yes comment=defconf name=bridge
+
+/interface wireless
+set [ find default-name=wlan1 ] antenna-gain=0 band=5ghz-onlyn country=\
+    "united states3" disabled=no frequency=5785 installation=any mode=bridge \
+    radio-name=$radioName ssid=$5gssid station-roaming=enabled \
+    wds-default-bridge=bridge wds-mode=dynamic
+
+/interface vlan
+add interface=bridge name=vlan50 vlan-id=50
+
+/interface wireless security-profiles
+set [ find default=yes ] authentication-types=wpa2-psk eap-methods="" mode=\
+    dynamic-keys supplicant-identity=webfireDef wpa2-pre-shared-key=$customerPasswordWPATwo
+
+/user group
+set full policy="local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,pas\
+    sword,web,sniff,sensitive,api,romon,dude,tikapp"
+
+/interface bridge port
+add bridge=bridge comment=defconf interface=ether1
+add bridge=bridge comment=defconf interface=wlan1
+
+/ip neighbor discovery-settings
+set discover-interface-list=!dynamic
+
+/ip address
+add address=192.168.20.167/22 comment="Mgmt IP" interface=vlan50 network=\
+    192.168.20.0
+add address=192.168.0.30/24 disabled=yes interface=bridge network=192.168.0.0
+
+/ip dns
+set servers=192.168.20.1
+
+/ip route
+add distance=1 gateway=192.168.20.1
+
+/system clock
+set time-zone-name=America/Chicago
+
+/system identity
+set name=$sysIdentity
+
+/system ntp client
+set enabled=yes server-dns-names=time.nist.gov
+
+/password old-password="" new-password=$adminPassword confirm-new-password=$adminPassword
+

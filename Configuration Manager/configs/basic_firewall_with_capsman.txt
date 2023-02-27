@@ -1,0 +1,146 @@
+# oct/07/2022 10:40:26 by RouterOS 6.49.5
+# software id = 5T2K-FIE4
+#
+# model = RB750r2
+# serial number = AA850B282EE3
+
+:global CMSP "%/capsman_password/%";
+:global CMC5 "%/ssid5/%";
+:global CMC2 "%/ssid2/%";
+:global sysidentity "%/system_identity/%";
+
+/caps-man channel
+add band=5ghz-a/n control-channel-width=20mhz frequency=5745 name=channel-5g
+add band=2ghz-b/g/n name=channel-2g
+
+/interface bridge
+add admin-mac=C4:AD:34:E5:88:E0 auto-mac=no name=brLAN
+
+/interface ethernet
+set [ find default-name=ether1 ] name=ether1-wan
+set [ find default-name=ether2 ] name=ether2-master-lan
+set [ find default-name=ether3 ] name=ether3-slave-lan
+set [ find default-name=ether4 ] name=ether4-slave-lan
+set [ find default-name=ether5 ] name=ether5-slave-lan
+
+#/interface pppoe-client
+#add add-default-route=yes disabled=no interface=ether1-wan name=PPPoE-Webfire \
+    password=WFw!reless use-peer-dns=yes user=TECH_SHOULD_KNOW_IF_NEEDED
+
+/caps-man datapath
+add bridge=brLAN name=datapath1
+
+/caps-man security
+add authentication-types=wpa2-psk name=security1 passphrase=$CMSP
+
+/caps-man configuration
+add channel=channel-5g datapath=datapath1 name=cfg-5g security=security1 ssid=$CMC5
+add channel=channel-2g datapath=datapath1 name=cfg-2g security=security1 ssid=$CMC2
+
+/interface wireless security-profiles
+set [ find default=yes ] supplicant-identity=webfireDef
+
+/ip pool
+add name=default-dhcp ranges=192.168.88.100-192.168.88.254
+
+/ip dhcp-server
+add address-pool=default-dhcp disabled=no interface=brLAN lease-time=3d name=\
+    defconf
+
+/caps-man manager
+set enabled=yes
+
+/caps-man manager interface
+set [ find default=yes ] forbid=yes
+add disabled=no interface=brLAN
+
+/caps-man provisioning
+add action=create-dynamic-enabled hw-supported-modes=an master-configuration=\
+    cfg-5g
+add action=create-dynamic-enabled hw-supported-modes=gn master-configuration=\
+    cfg-2g
+
+/interface bridge port
+add bridge=brLAN interface=ether2-master-lan
+add bridge=brLAN interface=ether3-slave-lan
+add bridge=brLAN interface=ether4-slave-lan
+add bridge=brLAN interface=ether5-slave-lan
+
+/ip address
+add address=192.168.88.1/24 comment=defconf interface=brLAN network=\
+    192.168.88.0
+
+/ip dhcp-server lease
+
+/ip dhcp-server network
+add address=192.168.88.0/24 dns-server=192.168.88.1 gateway=192.168.88.1 \
+    ntp-server=132.163.96.1
+
+/ip dns
+set allow-remote-requests=yes
+
+/ip dns static
+add address=192.168.88.1 name=router.lan
+
+/ip firewall filter
+add action=accept chain=input comment=\
+    "defconf: accept established,related,untracked" connection-state=\
+    established,related,untracked
+add action=drop chain=input comment="defconf: drop invalid" connection-state=\
+    invalid
+add action=accept chain=input comment="Winbox Remote Access" dst-port=8291 \
+    protocol=tcp src-address=64.57.224.15
+add action=accept chain=input comment="defconf: accept ICMP" protocol=icmp
+add action=drop chain=input comment="defconf: drop all not coming from LAN" \
+    in-interface=PPPoE-Webfire
+add action=drop chain=input comment="defconf: drop all not coming from LAN" \
+    in-interface=ether1-wan
+add action=accept chain=forward comment="defconf: accept in ipsec policy" \
+    ipsec-policy=in,ipsec
+add action=accept chain=forward comment="defconf: accept out ipsec policy" \
+    ipsec-policy=out,ipsec
+add action=fasttrack-connection chain=forward comment="defconf: fasttrack" \
+    connection-state=established,related
+add action=accept chain=forward comment=\
+    "defconf: accept established,related, untracked" connection-state=\
+    established,related,untracked
+add action=drop chain=forward comment="defconf: drop invalid" connection-state=\
+    invalid
+add action=drop chain=forward comment=\
+    "defconf:  drop all from WAN not DSTNATed" connection-nat-state=!dstnat \
+    connection-state=new in-interface=PPPoE-Webfire
+add action=drop chain=forward comment=\
+    "defconf:  drop all from WAN not DSTNATed" connection-nat-state=!dstnat \
+    connection-state=new in-interface=ether1-wan
+
+/ip firewall nat
+add action=masquerade chain=srcnat comment="defconf: masquerade" ipsec-policy=\
+    out,none out-interface=PPPoE-Webfire
+# add action=dst-nat chain=dstnat comment=ClaytonPtP-Master dst-port=8292 \
+    in-interface=PPPoE-Webfire protocol=tcp src-address=64.57.224.15 \
+    to-addresses=192.168.88.2 to-ports=8291
+# add action=dst-nat chain=dstnat comment=ClaytonPtP-Slave dst-port=8293 \
+    in-interface=PPPoE-Webfire protocol=tcp src-address=64.57.224.15 \
+    to-addresses=192.168.88.3 to-ports=8291
+
+#	ABOVE IS EXAMPLES OF HOW TO FORWARD TO OTHER MIKROTIKS ON THE NETWORK
+
+/ip firewall service-port
+set sip disabled=yes
+
+/ip service
+set telnet disabled=yes
+set ftp disabled=yes
+set www disabled=yes
+set ssh disabled=yes
+set api disabled=yes
+set api-ssl disabled=yes
+
+/system clock
+set time-zone-name=America/Chicago
+
+/system identity
+set name=$sysidentity
+
+/system ntp client
+set enabled=yes server-dns-names=time.nist.gov
