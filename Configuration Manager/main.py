@@ -111,7 +111,7 @@ print(f"Names of configs created: {config_names}")
 
         
 #This is the settings of the connection to the mikrotik router and will be used to send the commands using the api
-#connection = api.RouterOsApiPool('192.168.0.2', username='admin', password='Secure105!', port=8728, use_ssl=False, ssl_verify=True, ssl_verify_hostname=True)
+#connection = api.RouterOsApiPool('192.168.0.2', username='admin', password='********', port=8728, use_ssl=False, ssl_verify=True, ssl_verify_hostname=True)
 
 #This is the module object from routeros_api-use built in methods on the list provided from the api
 #commander = connection.get_api()
