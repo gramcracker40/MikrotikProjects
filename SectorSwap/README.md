@@ -1,4 +1,3 @@
-Certainly! Here's a reformatted version of your SectorSwap script documentation using Markdown for better readability:
 
 ---
 
@@ -63,5 +62,3 @@ Scans for available antennas and documents findings for `antenna_sitter`. It als
 Launched when `find_best_ssid` is initiated. Pings the previous sector antenna until reconnection is possible, then reassociates the SSID to the original one before the outage.
 
 ---
-
-This Markdown formatting enhances the readability and organization of your documentation, making it more user-friendly.
